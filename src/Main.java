@@ -1,8 +1,9 @@
-import SlidingWindow.BestTimeBuySellStock;
+import BinarySearch.BinarySearch;
 
 public class Main {
     public static void main(String[] args) {
-        int[] prices = {7,6,4,3,1};
-        System.out.println(new BestTimeBuySellStock().maxProfit(prices));
+        int[] nums = {0, 1, 2, 3, 4, 5};
+        int target = 3;
+        System.out.println(new BinarySearch().search(nums, target));
     }
 }
