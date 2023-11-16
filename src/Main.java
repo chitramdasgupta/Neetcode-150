@@ -1,14 +1,10 @@
-import TwoPointers.ThreeSum;
+import Stack.EvalReversePolishNotation;
 
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-      int[] input = new int[4];
-      input[0] = 0; input[1] = 0;
-      input[2] = 0; input[3] = 0;
-
-      List<List<Integer>> ans = new ThreeSum().threeSum(input);
-      System.out.println(ans.toString());
+        String[] input = {"10","6","9","3","+","-11","*","/","*","17","+","5","+"};
+        System.out.println(new EvalReversePolishNotation().evalRPN(input));
     }
 }
