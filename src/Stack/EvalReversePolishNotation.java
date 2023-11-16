@@ -10,27 +10,27 @@ public class EvalReversePolishNotation {
 
         for (String token : tokens) {
             switch (token) {
-                case "+" -> {
+                case "+": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first + second);
                 }
-                case "-" -> {
+                case "-": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first - second);
                 }
-                case "*" -> {
+                case "*": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first * second);
                 }
-                case "/" -> {
+                case "/": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first / second);
                 }
-                default -> operands.push(Integer.parseInt(token));
+                default: operands.push(Integer.parseInt(token));
             }
         }
 
