@@ -1,10 +1,8 @@
-import Stack.EvalReversePolishNotation;
-
-import java.util.*;
+import BinarySearch.FindMinimumInRotatedSortedArray;
 
 public class Main {
     public static void main(String[] args) {
-        String[] input = {"10","6","9","3","+","-11","*","/","*","17","+","5","+"};
-        System.out.println(new EvalReversePolishNotation().evalRPN(input));
+        int[] piles = {4,5,6,7,0,1,2};
+        System.out.println(new FindMinimumInRotatedSortedArray().findMin(piles));
     }
 }
