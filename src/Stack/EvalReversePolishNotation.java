@@ -14,21 +14,25 @@ public class EvalReversePolishNotation {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first + second);
+                    break;
                 }
                 case "-": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first - second);
+                    break;
                 }
                 case "*": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first * second);
+                    break;
                 }
                 case "/": {
                     int second = operands.pop();
                     int first = operands.pop();
                     operands.push(first / second);
+                    break;
                 }
                 default: operands.push(Integer.parseInt(token));
             }
