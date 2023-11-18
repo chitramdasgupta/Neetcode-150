@@ -37,3 +37,23 @@ public class TaskScheduler {
         return time;
     }
 }
+
+// We can directly use Pair in leetcode
+// But in my local system, it requires javafx
+class Pair<I extends Number, I1 extends Number> {
+    private I key;
+    private I val;
+
+    Pair(I key, I val) {
+        this.key = key;
+        this.val = val;
+    }
+
+    public I getKey() {
+        return key;
+    }
+
+    public I getValue() {
+        return val;
+    }
+}
