@@ -1,0 +1,268 @@
+#+TITLE: Coding review
+#+DATE: <2023-11-20 Mon>
+
+* Table of Contents :TOC:
+- [[#arrays-and-hashing][Arrays and Hashing]]
+  - [[#contains-duplicate][Contains Duplicate]]
+  - [[#valid-anagram][Valid Anagram]]
+  - [[#two-sum][Two Sum]]
+- [[#two-pointers][Two pointers]]
+  - [[#valid-palindrome][Valid Palindrome]]
+- [[#sliding-window][Sliding Window]]
+  - [[#best-time-to-buy-and-sell-stock][Best Time to Buy and Sell Stock]]
+- [[#stack][Stack]]
+  - [[#valid-parentheses][Valid Parentheses]]
+- [[#binary-search][Binary Search]]
+  - [[#binary-search-1][Binary Search]]
+- [[#linked-list][Linked List]]
+  - [[#reverse-linked-list][Reverse Linked List]]
+  - [[#merge-two-sorted-lists][Merge Two Sorted Lists]]
+  - [[#linked-list-cycle][Linked List Cycle]]
+
+* Arrays and Hashing
+** Contains Duplicate
+We only need to iterate over the numbers once, and check if the current number has already been encountered. If it has been, then we return =True=, else we continue by adding the num to the seen =hashSet=.
+
+#+begin_src python
+class Solution:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        seen = set()
+        for num in nums:
+            if num in seen:
+                return True
+            seen.add(num)
+
+        return False
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Valid Anagram
+We iterate over the two strings and check if they have the same number of occurrences of the same characters. If they do, then they are anagrams; else they are not.
+
+#+begin_src python
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        if len(s) != len(t): return False
+
+        freq = {}
+        for c in s:
+            if c not in freq:
+                freq[c] = 1
+            else:
+                freq[c] += 1
+
+        for c in t:
+            if c not in freq: return False
+
+            freq[c] -= 1
+            if freq[c] < 0: return False
+
+        return True
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Two Sum
+We iterate over the numbers, and check if the value that is equal to =target - num= has already been encountered before. If it has been, then we can simply return the current number index and the index associated with the other num seen previously.
+
+#+begin_src python
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        seen = {}
+        ans = []
+        for i, num in enumerate(nums):
+            req = target - num
+            if req in seen:
+                ans = [i, seen[req]]
+                break
+
+            seen[num] = i
+
+        return ans
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+* Two pointers
+We need to use two pointers—one starting from the beginning of the string, and another one from the end—and then move them towards each other. If we find any =non alpha-numeric= character we skip it, and for the comparison we do so by converting the characters into lowercase.
+
+** Valid Palindrome
+#+begin_src python
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        i, j = 0, len(s) - 1
+
+        while i < j:
+            while i < j and not s[i].isalnum():
+                i += 1
+            while i < j and not s[j].isalnum():
+                j -= 1
+
+            if i > j or s[i].lower() != s[j].lower():
+                return False
+
+            i += 1
+            j -= 1
+
+        return True
+#+end_src
+
+*** Time - O(n)
+*** Space - O(1)
+
+* Sliding Window
+** Best Time to Buy and Sell Stock
+We have to buy a stock at one day, and then sell it in the future (not in the same day) such that we maximize the profit.
+
+For each price in the array we are given, we can check if selling at that price gives the maximum profit; we can also check if the current price is lesser than the previous mimimum price: if it is then we make it the new buying price—the ideal buying price should be lowest.
+
+The key insight: the buying price is the left side of the sliding window and the current price is the right side. We reset the window whenever we encounter a price lesser than the previous buying price.
+
+#+begin_src python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        maximum = 0
+        buy = math.inf
+
+        for price in prices:
+            maximum = max(price - buy, maximum)
+            if price < buy:
+                buy = price
+
+        return maximum
+#+end_src
+
+*** Time - O(n)
+*** Space - O(1)
+
+* Stack
+** Valid Parentheses
+#+begin_src python
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = []
+        for c in s:
+            match c:
+                case ')':
+                    if not stack or stack[-1] != '(': return False
+                    stack.pop()
+                case '}':
+                    if not stack or stack[-1] != '{': return False
+                    stack.pop()
+                case ']':
+                    if not stack or stack[-1] != '[': return False
+                    stack.pop()
+                case '(' | '{' | '[':
+                    stack.append(c)
+
+        return len(stack) == 0
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+* Binary Search
+We return =-1= only when the left pointer goes beyond the right pointer—they can be equal when they happen to land on the same index.
+
+** Binary Search
+#+begin_src python
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        def binary_search(nums, l, r, target):
+            if l > r: return -1
+
+            mid = l + (r - l) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] < target:
+                return binary_search(nums, mid + 1, r, target)
+            if nums[mid] > target:
+                return binary_search(nums, l, mid - 1, target)
+
+        return binary_search(nums, 0, len(nums) - 1, target)
+#+end_src
+
+*** Time - O(log n)
+*** Space - O(log n)
+
+* Linked List
+** Reverse Linked List
+Just keep in mind how the linkage should be changed, and at the end of the loop which pointer will end up at the last node—which will be the first node of the reversed linked list.
+
+#+begin_src python
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        curr = head
+        follow = None
+
+        while curr:
+            follow = curr.next
+            curr.next = prev
+            prev = curr
+            curr = follow
+
+        return prev
+#+end_src
+
+*** Time - O(n)
+*** Space - O(1
+
+** TODO Merge Two Sorted Lists
+The first thing to keep in mind that we need to =merge= the two lists, and not create a new list.
+
+The key to this problem is to maintain a =dummy= node and a =curr= node. The =curr= node will trail one position behind the list pointers. And as a result, we will set the =next= node of the =curr= based on which node of =list1= or =list2= is smaller in value.
+
+#+begin_src python
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = curr = ListNode()
+
+        while list1 and list2:
+            if list1.val < list2.val:
+                curr.next = list1
+                list1 = list1.next
+            else:
+                curr.next = list2
+                list2 = list2.next
+            curr = curr.next
+
+        if list1:
+            curr.next = list1
+            list1 = list1.next
+            curr = curr.next
+
+        if list2:
+            curr.next = list2
+            list2 = list2.next
+            curr = curr.next
+
+        return dummy.next
+#+end_src
+
+*** Time - O(n)
+*** Space - O(1)
+
+** Linked List Cycle
+The key insight: the loop should terminate when either =slow= and =fast= point to the same node (this happens when there is a loop) or =fast= is =None= or =fast.next= is =None= (this happens when there is no loop and we can reach the end of the list by traversing along the list).
+
+#+begin_src python
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        slow = fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+            if slow == fast:
+                return True
+
+        return False
+#+end_src
+
+*** Time - O(n)
+*** Space - O(1)
