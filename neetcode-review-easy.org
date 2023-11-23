@@ -18,6 +18,13 @@
   - [[#reverse-linked-list][Reverse Linked List]]
   - [[#merge-two-sorted-lists][Merge Two Sorted Lists]]
   - [[#linked-list-cycle][Linked List Cycle]]
+- [[#trees][Trees]]
+  - [[#invert-binary-tree][Invert Binary Tree]]
+  - [[#maximum-depth-of-binary-tree][Maximum Depth of Binary Tree]]
+  - [[#diameter-of-binary-tree][Diameter of Binary Tree]]
+  - [[#balanced-binary-tree][Balanced Binary Tree]]
+  - [[#same-tree][Same Tree]]
+  - [[#subtree-of-another-tree][Subtree of Another Tree]]
 
 * Arrays and Hashing
 ** Contains Duplicate
@@ -266,3 +273,125 @@ class Solution:
 
 *** Time - O(n)
 *** Space - O(1)
+
+* Trees
+** Invert Binary Tree
+The idea is to invert the left and right children of the root node, and do the same thing recursively for each node in the tree.
+
+#+begin_src python
+class Solution:
+    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        if not root: return None
+
+        root.left, root.right = root.right, root.left
+
+        self.invertTree(root.left)
+        self.invertTree(root.right)
+
+        return root
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Maximum Depth of Binary Tree
+#+begin_src python
+class Solution:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        if not root: return 0
+
+        return 1 + max(self.maxDepth(root.left), self.maxDepth(root.right))
+#+end_src
+
+** TODO Diameter of Binary Tree
+The first thing to note is that the =diameter= is the longest path between any two nodes in the tree. The =path= between two nodes is the number of edges between.
+
+We solve this problem by calculating the _maximum height_ (with the _height_ defined as the _number of nodes between two nodes_) at each node _from the bottom level to the top level_. At each level we will have the maximum height along the left and right subtrees; we will then check if the sum of the maximum heights along the left and right subtrees is greater than the same at the last stage—if it is we can update the diameter.
+
+#+begin_src python
+class Solution:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        res = 0
+
+        # This dfs function calculates the maximum height of the tree
+        def dfs(node):
+            if not node: return 0
+
+            # The maximum heights along the left and right subtrees
+            left = dfs(node.left)
+            right = dfs(node.right)
+
+            nonlocal res
+            # we check if the sum of the max heights is greater than the
+            # previously calculated sum
+            res = max(res, left + right)
+
+            return 1 + max(left, right)
+
+        dfs(root)
+        return res
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Balanced Binary Tree
+The idea is to return two values from the depth first search traversal—whether the tree is balanced at the given level and the maximum height at the given label.
+
+#+begin_src python
+class Solution:
+    def isBalanced(self, root: Optional[TreeNode]) -> bool:
+        def dfs(root):
+            if not root: return True, 0
+
+            leftBalance, leftHeight = dfs(root.left)
+            rightBalance, rightHeight = dfs(root.right)
+
+            balance = leftBalance and rightBalance and abs(leftHeight - rightHeight) <= 1
+            height = 1 + max(leftHeight, rightHeight)
+
+            return balance, height
+
+        return dfs(root)[0]
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Same Tree
+#+begin_src python
+class Solution:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        if (p and not q) or (not p and q): return False
+        if not p and not q: return True
+
+        return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+#+end_src
+
+*** Time - O(n)
+*** Space - O(n)
+
+** Subtree of Another Tree
+We perform a Depth First Search Traversal on the =root= tree and check if the =subRoot= tree is a subtree of the =root= tree at the current level.
+
+#+begin_src python
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+        if not root and not subRoot: return True
+        if root and not subRoot: return True
+        if not root and subRoot: return False
+
+        check = self.isSameTree(root, subRoot)
+        return check or self.isSubtree(root.left, subRoot) or self.isSubtree(root.right, subRoot)
+
+    def isSameTree(self, p, q):
+        if not p and not q: return True
+        if (p and not q) or (not p and q): return False
+
+        return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+#+end_src
+
+We traverse the =n= nodes of the subtree for every =m= nodes of the tree.
+
+*** Time - O(m * n)
+*** Space - O(m)
