@@ -1,9 +1,8 @@
-import SlidingWindow.LongestRepeatingCharReplacement;
+import OneDimensionalDynamicProgramming.LongestPalindromicSubstring;
 
 public class Main {
     public static void main(String[] args) {
-        String input = "AABABBA";
-        int k = 1;
-        System.out.println(new LongestRepeatingCharReplacement().characterReplacement(input, k));
+        String input = "babad";
+        System.out.println(new LongestPalindromicSubstring().longestPalindrome(input));
     }
 }
