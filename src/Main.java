@@ -1,8 +1,9 @@
+import LinkedList.FindTheDuplicateNumber;
 import OneDimensionalDynamicProgramming.LongestPalindromicSubstring;
 
 public class Main {
     public static void main(String[] args) {
-        String input = "babad";
-        System.out.println(new LongestPalindromicSubstring().longestPalindrome(input));
+        int[] input = { 1, 3, 4, 2, 2};
+        System.out.println(new FindTheDuplicateNumber().findDuplicate(input));
     }
 }
