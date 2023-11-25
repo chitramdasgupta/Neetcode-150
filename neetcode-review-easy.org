@@ -25,6 +25,9 @@
   - [[#balanced-binary-tree][Balanced Binary Tree]]
   - [[#same-tree][Same Tree]]
   - [[#subtree-of-another-tree][Subtree of Another Tree]]
+- [[#heap-or-priority-queue][Heap or Priority Queue]]
+  - [[#kth-largest-element-in-a-stream][Kth Largest Element in a Stream]]
+  - [[#last-stone-weight][Last Stone Weight]]
 
 * Arrays and Hashing
 ** Contains Duplicate
@@ -395,3 +398,53 @@ We traverse the =n= nodes of the subtree for every =m= nodes of the tree.
 
 *** Time - O(m * n)
 *** Space - O(m)
+
+* Heap or Priority Queue
+** Kth Largest Element in a Stream
+The idea is to maintain a *k length* =min heap= where the =root element= will be the =kth largest element=. Whenever we have smaller-than-k min heap, we simply push the value. If we have already have k elements, then we can check if the incoming element is greater than the root element, if it is then we add the element to the heap, else we ignore it.
+
+#+begin_src python
+class KthLargest:
+    def __init__(self, k: int, nums: List[int]):
+        self.queue = []
+        self.k = k
+        for num in nums:
+            if len(self.queue) < k:
+                heappush(self.queue, num)
+            else:
+                if num > self.queue[0]:
+                    heappop(self.queue)
+                    heappush(self.queue, num)
+
+    def add(self, val: int) -> int:
+        if len(self.queue) < self.k:
+            heappush(self.queue, val)
+        elif val > self.queue[0]:
+            heappushpop(self.queue, val)
+
+        return self.queue[0]
+#+end_src
+
+*** Time - O(n log k + m log k) where m is the number of times =add= is called
+*** Space - O(k)
+
+** Last Stone Weight
+#+begin_src python
+class Solution:
+    def lastStoneWeight(self, stones: List[int]) -> int:
+        heap = []
+        for stone in stones:
+            heappush(heap, -stone)
+
+        while len(heap) >= 2:
+            y = -heappop(heap)
+            x = -heappop(heap)
+
+            if x != y:
+                heappush(heap, -(y - x))
+
+        return -heap[0] if heap else 0
+#+end_src
+
+*** Time - O(n log n)
+*** Space - O(n)
