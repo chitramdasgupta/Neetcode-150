@@ -433,3 +433,226 @@ private:
   }
 };
 ```
+
+9. Course Schedule II
+
+This problem expects us to find the topological order of the graph.
+
+```cpp
+class Solution {
+public:
+  vector<int> findOrder(int numCourses, vector<vector<int>> &prerequisites) {
+    // adjacency list: node -> its neighbors
+    unordered_map<int, vector<int>> adj{};
+    for (vector<int> prereq : prerequisites) {
+      adj[prereq[0]].push_back(prereq[1]);
+    }
+
+    vector<int> res{};
+    unordered_set<int> curr_path{};
+    unordered_set<int> visited{};
+    for (int i = 0; i < numCourses; ++i) {
+      if (!acyclic(adj, i, res, curr_path, visited)) {
+        return {};
+      }
+    }
+
+    return res;
+  }
+
+private:
+  // this dfs search checks for a cycle and builds a valid path touching all
+  // nodes as well
+  bool acyclic(unordered_map<int, vector<int>> &adj, int course,
+               vector<int> &res, unordered_set<int> &curr_path,
+               unordered_set<int> &visited) {
+    if (curr_path.contains(course)) {
+      return false;
+    }
+
+    // This means that the course has already been processed (i.e taken)
+    if (visited.contains(course)) {
+      return true;
+    }
+
+    curr_path.insert(course);
+    for (int next_course : adj[course]) {
+      if (!acyclic(adj, next_course, res, curr_path, visited)) {
+        return false;
+      }
+    }
+
+    curr_path.erase(course);
+    visited.insert(course);
+    res.push_back(course);
+    return true;
+  }
+};
+```
+
+10. Redundant Connection
+
+We can find the redundant connection (or an edge between two nodes of the same
+connected graph) using the `union-find algorithm`.
+
+```cpp
+class Solution {
+public:
+  vector<int> findRedundantConnection(vector<vector<int>> &edges) {
+    // The farthest node which is a parent of the node at the given index
+    vector<int> parents{};
+    // The size of the graph if the node at the given index were the parent
+    vector<int> ranks{};
+    for (int i = 0; i < edges.size() + 1; ++i) {
+      // Each node is assumed to be a parent of itself
+      parents.push_back(i);
+      // Each node is assumed to be present in a graph of size 1
+      ranks.push_back(1);
+    }
+
+    vector<int> res{};
+    for (vector<int> edge : edges) {
+      int n1 = edge[0];
+      int n2 = edge[1];
+      // If we cannot perform a union between the two nodes, it means that the
+      // nodes are already part of a connected graph
+      if (!do_union(n1, n2, parents, ranks)) {
+        return {n1, n2};
+      }
+    }
+
+    return res;
+  }
+
+private:
+  bool do_union(int n1, int n2, vector<int> &parents, vector<int> &ranks) {
+    // We find the fathest ancestor of the two nodes of the given edge
+    int p1 = do_find(n1, parents);
+    int p2 = do_find(n2, parents);
+
+    // If the farthest ancestors of the two nodes are same, it means that the
+    // nodes are already part of the same connected graph
+    if (p1 == p2) {
+      return false;
+    }
+
+    // We attach the smaller graph to the bigger one
+    if (ranks[p1] > ranks[p2]) {
+      parents[p2] = p1;
+      ranks[p1] += ranks[p2];
+    } else {
+      parents[p1] = p2;
+      ranks[p2] += ranks[p1];
+    }
+
+    return true;
+  }
+
+  int do_find(int node, vector<int> &parents) {
+    int parent = parents[node];
+
+    // We continue until we are at the farthest ancestor of the given node
+    // (where the node is a parent of itself)
+    while (parent != parents[parent]) {
+      parents[parent] = parents[parents[parent]];
+      parent = parents[parent];
+    }
+
+    return parent;
+  }
+};
+```
+
+11. Number of Connected Components in an Undirected Graph
+
+```cpp
+class Solution {
+public:
+  int countComponents(int n, vector<vector<int>> &edges) {
+    vector<int> parents{};
+    vector<int> ranks{};
+    // The number of edges we have able to create
+    int total = 0;
+
+    for (vector<int> edge: edges) {
+      int n1 = edge[0];
+      int n2 = edge[1];
+
+      if (do_union(n1, n2, parents, ranks)) {
+        ++total;
+      }
+    }
+
+    return n - total;
+  }
+
+private:
+  bool do_union(int n1, int n2, vector<int> &parents, vector<int> &ranks) {
+    int p1 = do_find(n1, parents);
+    int p2 = do_find(n2, parents);
+
+    if (p1 == p2) {
+      return false;
+    }
+
+    if (ranks[p1] < ranks[p1]) {
+      parents[p1] = p2;
+      ranks[p2] += ranks[p1];
+    } else {
+      parents[p2] = p1;
+      ranks[p1] += ranks[p2];
+    }
+
+    return true;
+  }
+
+  int do_find(int node, vector<int> &parents) {
+    int parent = parents[node];
+    
+    while (parent != parents[parent]) {
+      parents[parent] = parents[parents[parent]];
+      parent = parents[parent];
+    }
+
+    return parent;
+  }
+};
+```
+
+12. Graph Valid Tree
+
+```cpp
+class Solution {
+public:
+  bool validTree(int n, vector<vector<int>> &edges) {
+    unordered_map<int, vector<int>> adj{};
+    for (vector<int> edge : edges) {
+      adj[edge[0]].push_back(edge[1]);
+      adj[edge[1]].push_back(edge[0]);
+    }
+    
+    unordered_set<int> visited = {};
+    return acyclic(0, -1, adj, visited) && n == visited.size();
+  }
+  
+private:
+  bool acyclic(int node, int prev, unordered_map<int, vector<int>> &adj,
+               unordered_set<int> &visited) {
+    if (visited.contains(node)) {
+      return false;
+    }
+
+    visited.insert(node);
+    for (int neigh : adj[node]) {
+      if (neigh == prev) {
+        continue;
+      }
+      if (!acyclic(neigh, node, adj, visited)) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+};
+```
