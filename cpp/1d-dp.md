@@ -107,3 +107,160 @@ public:
   }
 };
 ```
+
+5. Longest Palindromic Substring
+
+```cpp
+class Solution {
+public:
+  string longestPalindrome(string s) {
+    int maxStart = 0;
+    int maxLen = 1;
+    for (int i = 0; i < s.size() - 1; ++i) {
+      // Odd length palindromes
+      expandFromMid(s, i, i, maxStart, maxLen);
+      // Even length palindromes
+      expandFromMid(s, i, i + 1, maxStart, maxLen);
+    }
+    
+    return s.substr(maxStart, maxLen);
+  }
+  
+private:
+  void expandFromMid(string &str, int start, int end, int &maxStart,
+                     int &maxLen) {
+    while (start >= 0 && end <= str.size() - 1 && str[start] == str[end]) {
+      --start;
+      ++end;
+    }
+
+    int currLen = end - start - 1;
+    if (currLen > maxLen) {
+      maxLen = currLen;
+      maxStart = start + 1;
+    }
+  }
+};
+```
+
+6. Palindromic Substrings
+
+```cpp
+class Solution {
+public:
+  int countSubstrings(string s) {
+    int count = 0;
+    for (int i = 0; i < s.size(); ++i) {
+      expandFromMid(s, i, i, count);
+      expandFromMid(s, i, i + 1, count);
+    }
+    
+    return count;
+  }
+  
+private:
+  void expandFromMid(string &str, int start, int end, int &count) {
+    while (start >= 0 && end <= str.size() - 1 && str[start] == str[end]) {
+      --start;
+      ++end;
+
+      // We have found one palindrome
+      ++count;
+    }
+  }
+};
+```
+
+7. Decode Ways ⭐
+
+If the code seems confusing. Take the example: s = "123" and walk through the
+code, along with drawing the possible decodings.
+
+```cpp
+class Solution {
+public:
+  int numDecodings(string s) {
+    // dp represents the no. of ways to decode s from index 0 till i + 1
+    vector<int> dp(s.size() + 1, 0);
+    // an empty string can only be decoded in one way (not decoded at all)
+    dp[0] = 1;
+    // The no. of ways the s from 0 till 1 (i.e the first char) can be decoded
+    dp[1] = s[0] == '0' ? 0 : 1;
+
+    for (int i = 2; i <= s.size(); ++i) {
+      // The single character at i-1 index can be used
+      // Think that the current character can be decoded by itself
+      // along with all the decodings we have till now
+      if (s[i - 1] != '0') {
+        dp[i] = dp[i - 1];
+      }
+
+      // The char at i-1 and i-2 indices can be used
+      if (s[i - 2] == '1' || (s[i - 2] == '2' && s[i - 1] <= '6')) {
+        dp[i] += dp[i - 2];
+      }
+    }
+
+    return dp[s.size()]; // No. of ways to decode s from index 0 till s.size()
+  }
+};
+```
+
+The optimal approach:
+
+```cpp
+class Solution {
+public:
+  int numDecodings(string s) {
+    // an empty string can only be decoded in one way (not decoded at all)
+    int twoBack = 1;
+    // The no. of ways the first char can be decoded
+    int oneBack = s[0] == '0' ? 0 : 1;
+
+    int curr = oneBack;
+    for (int i = 2; i <= s.size(); ++i) {
+      curr = 0;
+
+      // Taking the present char by itself
+      if (s[i - 1] != '0') {
+        curr += oneBack;
+      }
+
+      // Taking the present char and the prev char together
+      if (s[i - 2] == '1' || (s[i - 2] == '2' && s[i - 1] <= '6')) {
+        curr += twoBack;
+      }
+      
+      twoBack = oneBack;
+      oneBack = curr;
+    }
+
+    return curr; // No. of ways to decode s from index 0 till s.size()
+  }
+};
+```
+
+8. Coin Change
+
+```cpp
+class Solution {
+public:
+  int coinChange(vector<int> &coins, int amount) {
+    // How many coins we need to add up to the value i (index)
+    vector<int> dp(amount + 1, amount + 1);
+    dp[0] = 0; // We need no coins to add up to 0
+
+    for (int i = 1; i <= amount; ++i) {
+      for (int &coin : coins) {
+        if (coin > i) {
+          continue;
+        }
+
+        dp[i] = min(dp[i], 1 + dp[i - coin]);
+      }
+    }
+
+    return dp[amount] == amount + 1 ? -1 : dp[amount];
+  }
+};
+```
