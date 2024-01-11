@@ -264,3 +264,142 @@ public:
   }
 };
 ```
+
+9. Maximum Product Subarray
+
+```cpp
+class Solution {
+public:
+  int maxProduct(vector<int> &nums) {
+    int currMin = 1;
+    int currMax = 1;
+    int res = nums[0];
+    for (int &num : nums) {
+      int temp = currMax * num;
+
+      currMax = max(max(currMax * n, currMin * n), n);
+      currMin = min(min(temp, currMin * n), n);
+
+      res = max(res, currMax);
+    }
+
+    return res;
+  }
+};
+```
+
+10. Word Break
+
+```cpp
+class Solution {
+public:
+  bool wordBreak(string s, vector<string> &wordDict) {
+    set<string> dict(wordDict.begin(), wordDict.end());
+
+    int strLen = s.size();
+    vector<int> dp(strLen + 1, false);
+    dp[0] = true; // Word with no chars trivially present in all dictionaries
+    for (int i = 1; i <= strLen; ++i) {
+      for (int j = i - 1; j >= 0; --j) {
+        if (dp[j]) {
+          string word = s.substr(j, i - j);
+
+          if (dict.contains(word)) {
+            dp[i] = true;
+            break;
+          }
+        }
+      }
+    }
+
+    return dp[strLen];
+  }
+};
+```
+
+11. Longest Increasing Subsequence
+
+Time - O(n^2)
+Space - O(n)
+
+```cpp
+class Solution {
+public:
+  int lengthOfLIS(vector<int> &nums) {
+    vector<int> dp(nums.size(), 1);
+    int res = 1;
+    for (int i = 1; i < nums.size(); ++i) {
+      for (int j = 0; j < i; ++j) {
+        if (nums[i] > nums[j]) {
+          dp[i] = max(dp[i], dp[j] + 1);
+        }
+      }
+      res = max(res, dp[i]);
+    }
+
+    return res;
+  }
+};
+```
+
+Optimal approach using *patience sorting*
+
+Time - O(nlog n)
+Space - O(n)
+
+```cpp
+// Remember: the key insight in this solution is that the last element of the
+tails vector is the last element of the LIS; the tails vector is NOT necessarily
+// a valid LIS
+class Solution {
+public:
+  int lengthOfLIS(vector<int> &nums) {
+    vector<int> tails(1, nums[0]);
+    for (int &num : nums) {
+      // If the current number is greater than the last element in the
+      // subsquence
+      if (num > tails.back()) {
+        tails.push_back();
+      } else {
+        // pos is the first index with a val >= the current number
+        int pos = lower_bound(tails.begin(), tails.end(), num) - tails.begin();
+        tails[pos] = num;
+      }
+    }
+
+    return nums.size();
+  }
+};
+```
+
+12. Partition Equal Subset Sum
+
+```cpp
+class Solution {
+public:
+  bool canPartition(vector<int> &nums) {
+    int totalSum = accumulate(nums.begin(), nums.end(), 0);
+    // An odd value cannot be achieved by adding two numbers
+    if (totalSum % 2 == 1) {
+      return false;
+    }
+
+    totalSum /= 2;
+    // Whether index is achievable with the given numbers
+    vector<bool> dp(totalSum, false);
+    // We can get 0 (if we do not choose any number)
+    dp[0] = true;
+    for (int &num : nums) {
+      for (int sum = totalSum; i >= num; --i) {
+        // Whether the sum is achievable with the current num and any of the
+        // previously achieved sums
+        if (dp[sum - num]) {
+          dp[sum] = true;
+        }
+      }
+    }
+
+    return dp[totalSum];
+  }
+};
+```
