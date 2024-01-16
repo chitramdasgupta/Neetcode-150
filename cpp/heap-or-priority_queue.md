@@ -92,6 +92,16 @@ public:
 
     return res;
   }
+
+// not used; only kept for reference (use as ', CompareVectors')
+private:
+  struct CompareVectors {
+    bool operator()(const vector<int> &a, const vector<int> &b) {
+      return a[0] > b[0];
+    }
+  };
+};
+
 };
 ```
 
