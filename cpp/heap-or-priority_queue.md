@@ -68,11 +68,14 @@ public:
 
 3. K Closest Points to Origin
 
+NOTE: We only need to write a custom comparator when we want to heapify be an
+element other than the first one.
+
 ```cpp
 class Solution {
 public:
   vector<vector<int>> kClosest(vector<vector<int>> &points, int k) {
-    priority_queue<vector<int>, vector<vector<int>>, CompareVectors> minHeap;
+    priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> minHeap;
 
     for (vector<int> point : points) {
       int dist = (point[0] * point[0]) + (point[1] * point[1]);
@@ -89,13 +92,6 @@ public:
 
     return res;
   }
-
-private:
-  struct CompareVectors {
-    bool operator()(const vector<int> &a, const vector<int> &b) {
-      return a[0] > b[0];
-    }
-  };
 };
 ```
 
