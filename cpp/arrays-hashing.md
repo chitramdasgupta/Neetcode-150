@@ -1,3 +1,159 @@
+1. Contains Duplicate
+
+```cpp
+class Solution {
+public:
+	bool containsDuplicate(vector<int> &nums) {
+		unordered_set<int> seen;
+		for (int &num : nums) {
+			if (seen.contains(num)) {
+				return true;
+			}
+			seen.insert(num);
+		}
+
+		return false;
+	}
+};
+```
+
+2. Valid Anagram
+
+```cpp
+class Solution {
+public:
+  bool isAnagram(string s, string t) {
+    if (s.size() != t.size()) {
+      return false;
+    }
+
+  	unordered_map<char, int> freq;
+  	for (char &c : s) {
+  		++freq[c];
+  	}
+
+  	for (char &c : t) {
+  		if (!freq.contains(c) || freq[c] == 0) {
+  			return false;
+  		}
+
+  		--freq[c];
+  	}
+
+  	return true;
+  }
+};
+```
+
+3. Two Sum
+
+```cpp
+class Solution {
+public:
+  vector<int> twoSum(vector<int> &nums, int target) {
+    unordered_map<int, int> indices;
+    vector<int> res;
+    for (int i = 0; i < nums.size(); ++i) {
+    	int toCheck = target - nums[i];
+    	if (indices.contains(toCheck)) {
+    		res.push_back(i);
+    		res.push_back(indices[toCheck]);
+    		break;
+    	}
+
+    	indices[nums[i]] = i;
+    }
+
+    return res;
+  }
+};
+```
+
+4. Group Anagrams
+
+```cpp
+class Solution {
+public:
+  vector<vector<string>> groupAnagrams(vector<string> &strs) {
+    unordered_map<string, vector<string>> anagrams;
+    for (string str : strs) {
+    	string originalStr = str;
+    	sort(str.begin(), str.end());
+    	anagrams[str].push_back(originalStr);
+    }
+
+    vector<vector<string>> res;
+    for (auto [key, val] : anagrams) {
+    	res.push_back(val);
+    }
+
+    return res;
+  }
+};
+```
+
+5. Top K Frequent Elements
+
+```cpp
+class Solution {
+public:
+  vector<int> topKFrequent(vector<int> &nums, int k) {
+    unordered_map<int, int> freq;
+    for (int num : nums) {
+      ++freq[num];
+    }
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>,
+                   greater<pair<int, int>>> pq;
+    for (pair<int, int> item : freq) {
+      pq.push({item.second, item.first});
+
+      if (pq.size() > k) {
+        pq.pop();
+      }
+    }
+
+    vector<int> res;
+    while (!pq.empty()) {
+      pair<int, int> item = pq.top();
+      pq.pop();
+      res.push_back(item.second);
+    }
+    return res;
+  }
+};
+```
+
+6. Product of Array Except Self
+
+```cpp
+class Solution {
+public:
+  vector<int> productExceptSelf(vector<int> &nums) {
+    vector<int> suffix(nums.size(), 1);
+    int suff = 1;
+    for (int i = nums.size() - 2; i >= 0; --i) {
+    	suff *= nums[i + 1];
+    	suffix[i] = suff;
+    }
+
+    vector<int> prefix(nums.size(), 1);
+    int pref = 1;
+    for (int i = 1; i < nums.size(); ++i) {
+    	pref *= nums[i - 1];
+    	prefix[i] = pref;
+    }
+
+    vector<int> res(nums.size(), 1);
+    for (int i = 0; i < res.size(); ++i) {
+    	res[i] = suffix[i] * prefix[i];
+    }
+
+    return res;
+  }
+};
+```
+
 7. Valid Sudoku
 
 ```cpp
