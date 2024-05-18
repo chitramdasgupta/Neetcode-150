@@ -39,7 +39,62 @@ Time - O(n), where n is the number of nodes in the binary tree
 Space - O(h), where h is the height of the binary tree
 ```
 
-# 3. Same Tree
+# 3. Diamter of Binary Tree
+
+```python
+class Solution:
+  def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+    res = 0
+
+    def dfs(root):
+      if not root: return 0
+
+      leftHeight = dfs(root.left)
+      rightHeight = dfs(root.right)
+
+      nonlocal res
+      res = max(res, leftHeight + rightHeight)
+
+      return 1 + max(leftHeight, rightHeight)
+
+    dfs(root)
+    return res
+```
+
+```
+Time - O(n), where n is the number of nodes in the binary tree
+Space - O(h), where h is the height of the binary tree
+```
+
+# 4. Balanced Binary Tree
+
+```python
+class Solution:
+  def isBalanced(self, root: Optional[TreeNode]) -> bool:
+    res = True
+
+    def dfs(root):
+      if not root: return 0
+
+      leftHeight = dfs(root.left)
+      rightHeight = dfs(root.right)
+
+      nonlocal res
+      if abs(leftHeight - rightHeight) > 1: res = False
+
+      return 1 + max(leftHeight, rightHeight)
+
+    dfs(root)
+    return res
+```
+
+
+```
+Time - O(n), where n is the number of nodes in the binary tree
+Space - O(h), where h is the height of the binary tree
+```
+
+# 5. Same Tree
 
 Two binary trees are the same if they are structurally identical, and the nodes
 have the same value.
@@ -61,7 +116,7 @@ Time - O(n), where n is the minimum number of nodes in either tree
 Space - O(h), where h is the minimum height of the two trees
 ```
 
-# 4. Subtree of Another Tree
+# 6. Subtree of Another Tree
 
 ```python
 class Solution:
@@ -88,7 +143,7 @@ Time - O(m * n), where m is the number of nodes in the main tree and n is the nu
 Space - O(h), where h is the height of the main tree
 ```
 
-# 5. Lowest Common Ancestor of a Binary Search Tree
+# 7. Lowest Common Ancestor of a Binary Search Tree
 
 The LCA of a binary search tree is the closest ancestor of two nodes such that
 the two nodes are ancestors of the LCA node. Note that, of the two given nodes
@@ -111,7 +166,7 @@ Time - O(h), where h is the height of the binary search tree
 Space - O(h), where h is the height of the binary search tree
 ```
 
-# 6. Binary Tree Level Order Traversal
+# 8. Binary Tree Level Order Traversal
 
 This is also called Breadth-First Search (BFS)
 
@@ -142,7 +197,64 @@ Time - O(n), where n is the number of nodes in the binary tree
 Space - O(n), where n is the number of nodes in the binary tree
 ```
 
-# 7. Validate Binary Search Tree
+# 9. Binary Tree Right Side View
+
+```python
+class Solution:
+  def rightSideView(self, root: Optional[TreeNode]) -> List[int]:
+    ans = []
+    if not root: return ans
+
+    queue = collections.deque([root])
+    while queue:
+      length = len(queue)
+      curr = []
+      for i in range(length):
+        node = queue.popleft()
+
+        if i == length - 1:
+          ans.append(node.val)
+
+        if node.left: queue.append(node.left)
+        if node.right: queue.append(node.right)
+
+    return ans
+```
+
+```
+Time - O(n), where n is the number of nodes in the binary tree
+Space - O(n), where n is the number of nodes in the binary tree
+```
+
+# 10. Count Good Nodes In Binary Tree
+
+A node is said to be good, if in the path from the root to the node there is no node with a value greater than the node.
+
+```python
+class Solution:
+  def goodNodes(self, root: TreeNode) -> int:
+    count = 0
+    def dfs(root, maxSoFar):
+      if not root: return
+
+      dfs(root.left, max(root.val, maxSoFar))
+      dfs(root.right, max(root.val, maxSoFar))
+
+      nonlocal count
+      if root.val >= maxSoFar:
+        count += 1
+
+    dfs(root, root.val)
+    return count
+```
+
+```
+Time - O(n), where n is the number of nodes in the binary search tree
+Space - O(h), where h is the height of the binary search tree
+
+```
+
+# 11. Validate Binary Search Tree
 
 ```python
 class Solution:
@@ -163,7 +275,7 @@ Time - O(n), where n is the number of nodes in the binary search tree
 Space - O(h), where h is the height of the binary search tree
 ```
 
-# 8. Kth Smallest Element In a Bst
+# 12. Kth Smallest Element In a Bst
 
 We perform an inorder search and keep track of the decrementing k.
 
@@ -192,7 +304,7 @@ Time - O(h + k), where h is the height of the binary search tree and k is the in
 Space - O(h), where h is the height of the binary search tree
 ```
 
-# 9. Construct Binary Tree From Preorder And Inorder Traversal
+# 13. Construct Binary Tree From Preorder And Inorder Traversal
 
 ```python
 class Solution:
