@@ -1,3 +1,8 @@
+`heapify()` takes `O(n)` time.
+
+`heappush()`  and `heappop()` take `O(log n)` time. Thus, performing `heappush()`
+`n` times will take `O(n log (n))` time.
+
 # 1. Kth Largest Element in a Stream
 
 ```python
