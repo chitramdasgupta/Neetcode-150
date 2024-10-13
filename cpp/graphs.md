@@ -42,18 +42,72 @@ We do a BFS on the graph, and store the nodes we encounter in a hash map where
 the key is the node and the corresponding value is the cloned node.
 
 ```cpp
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+*/
+
+class Solution {
+public:
+  Node* cloneGraph(Node* node) {
+    if (node == nullptr) {
+      return node;
+    }
+
+    unordered_map<Node *, Node *> old_to_new;
+
+    dfs(old_to_new, node);
+
+    return old_to_new[node];
+  }
+
+private:
+  Node* dfs(unordered_map<Node *, Node *> &old_to_new, Node* node) {
+    if (old_to_new.contains(node)) {
+      return old_to_new[node];
+    }
+
+    Node* newNode = new Node(node->val);
+    old_to_new[node] = newNode;
+
+    for (Node *neigh : node->neighbors) {
+      old_to_new[node]->neighbors.push_back(dfs(old_to_new, neigh));
+    }
+
+    return newNode;
+  }
+};
+```
+
+```cpp
 class Solution {
 public:
   Node* cloneGraph(Node* node) {
     if (node == nullptr) {
       return nullptr;
     }
-    
+
     Node* copy = new Node(node->val);
     hash_map[node] = copy;
-    
+
     queue<Node*> nodes_queue {{node}};
-    
+
     while(!nodes_queue.empty()) {
       Node* curr = nodes_queue.front();
       nodes_queue.pop();
@@ -69,10 +123,10 @@ public:
         hash_map[curr]->neighbors.push_back(hash_map[neighbor]);
       }
     }
-    
+
     return copy;
   }
-  
+
 private:
   unordered_map<Node*, Node*> hash_map;
 };
@@ -270,6 +324,56 @@ private:
 ```cpp
 class Solution {
 public:
+  int orangesRotting(vector<vector<int>>& grid) {
+    int fresh = 0;
+    queue<pair<int, int>> q;
+    for (int i = 0; i < grid.size(); ++i) {
+      for (int j = 0; j < grid[0].size(); ++j) {
+        if (grid[i][j] == 2) {
+          q.push({i, j});
+        } else if (grid[i][j] == 1) {
+          ++fresh;
+        }
+      }
+    }
+
+    int time = 0;
+    while (fresh > 0 && !q.empty()) {
+      int len = q.size();
+      for (int i = 0; i < len; ++i) {
+        int row = q.front().first;
+        int col = q.front().second;
+        q.pop();
+
+        for (pair<int, int> dir : directions) {
+          int neigh_row = row + dir.first;
+          int neigh_col = col + dir.second;
+
+          if (neigh_row < 0 || neigh_row >= grid.size() || neigh_col < 0 ||
+              neigh_col >= grid[0].size() || grid[neigh_row][neigh_col] != 1) {
+            continue;
+          }
+
+          --fresh;
+          grid[neigh_row][neigh_col] = 2;
+          q.push({neigh_row, neigh_col});
+        }
+      }
+
+      ++time;
+    }
+
+    return fresh == 0 ? time : -1;
+  }
+
+private:
+  vector<pair<int, int>> directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+};
+```
+
+```cpp
+class Solution {
+public:
   int orangesRotting(vector<vector<int>> &grid) {
     queue<pair<int, int>> rotten_queue = {};
     int fresh = 0;
@@ -339,7 +443,7 @@ public:
         }
       }
     }
-    
+
     while (!gates_queue.empty()) {
       int len = gates_queue.size();
       for (int i = 0; i < len; ++i) {
@@ -350,7 +454,7 @@ public:
         for (pair<int, int> dir : directions) {
           int neigh_row = row + dir.first;
           int neigh_col = col + dir.second;
-          
+
           if (neigh_row < 0 || neigh_row >= n_rows || neigh_col < 0 ||
               neigh_col >= n_cols || rooms[row][col] == -1 ||
               rooms[row][col] + 1 >= rooms[neigh_row][neigh_col]) {
@@ -571,6 +675,12 @@ public:
   int countComponents(int n, vector<vector<int>> &edges) {
     vector<int> parents{};
     vector<int> ranks{};
+
+    for (int i = 0; i < edges.size() + 1; ++i) {
+      parents.push_back(i);
+      ranks.push_back(1);
+    }
+
     // The number of edges we have able to create
     int total = 0;
 
@@ -595,7 +705,7 @@ private:
       return false;
     }
 
-    if (ranks[p1] < ranks[p1]) {
+    if (ranks[p1] < ranks[p2]) {
       parents[p1] = p2;
       ranks[p2] += ranks[p1];
     } else {
@@ -608,7 +718,7 @@ private:
 
   int do_find(int node, vector<int> &parents) {
     int parent = parents[node];
-    
+
     while (parent != parents[parent]) {
       parents[parent] = parents[parents[parent]];
       parent = parents[parent];
@@ -624,17 +734,67 @@ private:
 ```cpp
 class Solution {
 public:
+  bool validTree(int n, vector<vector<int>>& edges) {
+    unordered_map<int, vector<int>> adj_list;
+    for (vector<int> &edge : edges) {
+        adj_list[edge[0]].push_back(edge[1]);
+        adj_list[edge[1]].push_back(edge[0]);
+    }
+
+    unordered_set<int> curr_path;
+    unordered_set<int> visited;
+
+    for (int i = 0; i < n; ++i) {
+        if (!dfs(adj_list, curr_path, visited, i, -1)) {
+            return false;
+        }
+    }
+
+    return visited.size() == n;
+  }
+
+private:
+  bool dfs(unordered_map<int, vector<int>> &adj_list, unordered_set<int> &curr_path,
+           unordered_set<int> &visited, int node, int prevNode) {
+    if (curr_path.contains(node)) {
+        return false;
+    }
+
+    if (visited.contains(node)) {
+        return true;
+    }
+
+    curr_path.insert(node);
+    for (int neigh : adj_list[node]) {
+        if (neigh == prevNode) {
+            continue;
+        }
+        if (!dfs(adj_list, curr_path, visited, neigh, node)) {
+            return false;
+        }
+    }
+
+    curr_path.erase(node);
+    visited.insert(node);
+    return true;
+  }
+};
+```
+
+```cpp
+class Solution {
+public:
   bool validTree(int n, vector<vector<int>> &edges) {
     unordered_map<int, vector<int>> adj{};
     for (vector<int> edge : edges) {
       adj[edge[0]].push_back(edge[1]);
       adj[edge[1]].push_back(edge[0]);
     }
-    
+
     unordered_set<int> visited = {};
     return acyclic(0, -1, adj, visited) && n == visited.size();
   }
-  
+
 private:
   bool acyclic(int node, int prev, unordered_map<int, vector<int>> &adj,
                unordered_set<int> &visited) {
@@ -651,7 +811,7 @@ private:
         return false;
       }
     }
-    
+
     return true;
   }
 };
