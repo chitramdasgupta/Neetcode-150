@@ -226,3 +226,127 @@ class Solution {
 }
 ```
 
+# Count Good Nodes In A Binary Tree
+
+```java
+class Solution {
+    private int res = 0;
+
+    public int goodNodes(TreeNode root) {
+        dfs(root, Integer.MIN_VALUE);
+        return res;
+    }
+
+    private void dfs(TreeNode root, int maxVal) {
+        if (root == null) {
+            return;
+        }
+
+        if (root.val >= maxVal) {
+            ++res;
+        }
+
+        dfs(root.left, Math.max(root.val, maxVal));
+        dfs(root.right, Math.max(root.val, maxVal));
+    }
+}
+
+```
+
+# Validate Binary Search Tree
+
+```java
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return dfs(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    private boolean dfs(TreeNode root, long left, long right) {
+        if (root == null) {
+            return true;
+        }
+
+        if (root.val <= left || root.val >= right) {
+            return false;
+        }
+
+        return dfs(root.left, left, root.val) &&
+               dfs(root.right, root.val, right);
+    }
+}
+```
+
+# Kth Smallest Element In A Binary Search Tree
+
+```java
+class Solution {
+    private int count;
+    private int res;
+
+    public int kthSmallest(TreeNode root, int k) {
+        count = k;
+
+        dfs(root, k);
+
+        return res;
+    }
+
+    private void dfs(TreeNode root, int k) {
+        if (root == null) {
+            return;
+        }
+
+        dfs(root.left, k);
+
+        --count;
+        if (count == 0) {
+            res = root.val;
+        }
+
+        dfs(root.right, k);
+    }
+}
+```
+
+# Construct Binary Tree From Preorder And Inorder Traversal
+
+```java
+class Solution {
+    private int[] preorder;
+    private int[] inorder;
+    private Map<Integer, Integer> inorderMap = new HashMap<>();
+    private int rootIndex = 0;
+
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        this.preorder = preorder;
+        this.inorder = inorder;
+        for (int i = 0; i < inorder.length; ++i) {
+            inorderMap.put(inorder[i], i);
+        }
+
+        return helper(0, preorder.length - 1);
+    }
+
+    // left and right represent the current subarray of inorder being processed
+    private TreeNode helper(int left, int right) {
+        if (left > right) {
+            return null;
+        }
+
+        // Create a new node from the first unprocessed value in preorder
+        TreeNode root = new TreeNode(preorder[rootIndex]);
+        ++rootIndex;
+
+        // The split in the inorder traversal for the current node
+        int pos = inorderMap.get(root.val);
+
+        // The left subtree will consist of the values to the left of the split
+        // Likewise, for the right subtree.
+        root.left = helper(left, pos - 1);
+        root.right = helper(pos + 1, right);
+
+        return root;
+    }
+}
+```
+
